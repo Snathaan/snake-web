@@ -4,7 +4,9 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 const GRID = 20;
 const COLORS = [0x46e678, 0x5aaaff];
 const ES_TACTIL =
-  window.matchMedia("(pointer: coarse)").matches || "ontouchstart" in window;
+  (navigator.maxTouchPoints || 0) > 0 ||
+  "ontouchstart" in window ||
+  window.matchMedia("(pointer: coarse)").matches;
 
 const offset = (v) => v - (GRID - 1) / 2;
 const worldX = (x) => -offset(x);
@@ -310,48 +312,48 @@ const controlesTactiles = document.getElementById("controles-tactiles");
 
 if (ES_TACTIL) {
   controlesTactiles.style.display = "grid";
-
-  for (const boton of controlesTactiles.querySelectorAll("button")) {
-    const dir = boton.dataset.dir;
-    const manejar = (event) => {
-      event.preventDefault();
-      sendDirection(dir);
-    };
-    boton.addEventListener("touchstart", manejar, { passive: false });
-    boton.addEventListener("mousedown", manejar);
-  }
-
-  let inicioToque = null;
-  const UMBRAL = 24;
-  const lienzo = renderer.domElement;
-
-  lienzo.addEventListener(
-    "touchstart",
-    (event) => {
-      if (event.touches.length !== 1) return;
-      const t = event.touches[0];
-      inicioToque = { x: t.clientX, y: t.clientY };
-    },
-    { passive: true }
-  );
-
-  lienzo.addEventListener(
-    "touchend",
-    (event) => {
-      if (!inicioToque) return;
-      const t = event.changedTouches[0];
-      const dx = t.clientX - inicioToque.x;
-      const dy = t.clientY - inicioToque.y;
-      inicioToque = null;
-      if (Math.hypot(dx, dy) < UMBRAL) return;
-      if (Math.abs(dx) > Math.abs(dy)) {
-        sendDirection(dx > 0 ? "right" : "left");
-      } else {
-        sendDirection(dy > 0 ? "down" : "up");
-      }
-    },
-    { passive: true }
-  );
 }
+
+for (const boton of controlesTactiles.querySelectorAll("button")) {
+  const dir = boton.dataset.dir;
+  const manejar = (event) => {
+    event.preventDefault();
+    sendDirection(dir);
+  };
+  boton.addEventListener("touchstart", manejar, { passive: false });
+  boton.addEventListener("mousedown", manejar);
+}
+
+let inicioToque = null;
+const UMBRAL = 24;
+const lienzo = renderer.domElement;
+
+lienzo.addEventListener(
+  "touchstart",
+  (event) => {
+    if (event.touches.length !== 1) return;
+    const t = event.touches[0];
+    inicioToque = { x: t.clientX, y: t.clientY };
+  },
+  { passive: true }
+);
+
+lienzo.addEventListener(
+  "touchend",
+  (event) => {
+    if (!inicioToque) return;
+    const t = event.changedTouches[0];
+    const dx = t.clientX - inicioToque.x;
+    const dy = t.clientY - inicioToque.y;
+    inicioToque = null;
+    if (Math.hypot(dx, dy) < UMBRAL) return;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      sendDirection(dx > 0 ? "right" : "left");
+    } else {
+      sendDirection(dy > 0 ? "down" : "up");
+    }
+  },
+  { passive: true }
+);
 
 connect();

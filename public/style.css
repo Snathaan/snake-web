@@ -22,6 +22,8 @@ canvas {
 
 #controles-tactiles {
   position: fixed;
+  right: 18px;
+  bottom: 18px;
   right: max(18px, env(safe-area-inset-right));
   bottom: max(18px, env(safe-area-inset-bottom));
   display: none;
@@ -32,6 +34,12 @@ canvas {
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
+}
+
+@media (pointer: coarse), (hover: none) {
+  #controles-tactiles {
+    display: grid;
+  }
 }
 
 #controles-tactiles button {
