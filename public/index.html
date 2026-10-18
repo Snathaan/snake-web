@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Snake 3D Multijugador</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -32,8 +32,15 @@
       <div id="estado" class="estado"></div>
       <button id="revancha" class="primario" style="display:none">Revancha</button>
 
-      <div class="ayuda">Mu&eacute;vete con WASD o las flechas</div>
+      <div class="ayuda">Mu&eacute;vete con WASD, flechas o deslizando el dedo</div>
     </div>
+  </div>
+
+  <div id="controles-tactiles">
+    <button class="up" data-dir="up" aria-label="Arriba">&#9650;</button>
+    <button class="left" data-dir="left" aria-label="Izquierda">&#9664;</button>
+    <button class="right" data-dir="right" aria-label="Derecha">&#9654;</button>
+    <button class="down" data-dir="down" aria-label="Abajo">&#9660;</button>
   </div>
 
   <script src="config.js"></script>
