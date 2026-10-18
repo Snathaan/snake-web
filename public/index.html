@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Snake 3D Multijugador</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="hud">
+    <div id="puntajes"></div>
+  </div>
+
+  <div id="overlay">
+    <div class="panel">
+      <h1>SNAKE 3D</h1>
+      <p class="sub">Multijugador por codigo de sala</p>
+
+      <div id="menu">
+        <button id="crear" class="primario">Crear sala</button>
+        <div class="sep">o unete con un codigo</div>
+        <div class="fila">
+          <input id="codigo" maxlength="4" placeholder="CODIGO" autocomplete="off" spellcheck="false" />
+          <button id="unir">Unirse</button>
+        </div>
+      </div>
+
+      <div id="sala" class="sala" style="display:none">
+        Codigo de sala: <b id="codigo-txt"></b>
+      </div>
+
+      <div id="estado" class="estado"></div>
+      <button id="revancha" class="primario" style="display:none">Revancha</button>
+
+      <div class="ayuda">Mu&eacute;vete con WASD o las flechas</div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module" src="game.js"></script>
+</body>
+</html>

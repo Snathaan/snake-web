@@ -1,0 +1,13 @@
+{
+  "name": "snake-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Snake 3D multijugador por codigo de sala (WebSocket + Three.js)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

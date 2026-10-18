@@ -1,0 +1,5 @@
+{
+  "installCommand": "echo \"frontend estatico: sin dependencias\"",
+  "buildCommand": "echo \"no hay build\"",
+  "outputDirectory": "public"
+}

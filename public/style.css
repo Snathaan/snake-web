@@ -1,0 +1,159 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  background: #10141c;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #eef2f7;
+}
+
+canvas {
+  display: block;
+}
+
+#hud {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  z-index: 5;
+}
+
+#puntajes {
+  padding: 8px 18px;
+  border-radius: 10px;
+  background: rgba(20, 26, 36, 0.75);
+  border: 1px solid rgba(90, 170, 255, 0.4);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  background: radial-gradient(circle at 50% 40%, rgba(20, 30, 45, 0.7), rgba(8, 10, 16, 0.92));
+}
+
+.panel {
+  width: 380px;
+  max-width: 92vw;
+  padding: 28px 26px;
+  border-radius: 18px;
+  background: rgba(22, 28, 40, 0.95);
+  border: 1px solid rgba(90, 170, 255, 0.25);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  text-align: center;
+}
+
+h1 {
+  font-size: 34px;
+  letter-spacing: 4px;
+  color: #5aaaff;
+}
+
+.sub {
+  margin: 6px 0 20px;
+  color: #98a4b6;
+  font-size: 14px;
+}
+
+#menu .sep {
+  margin: 18px 0 10px;
+  color: #7b8798;
+  font-size: 13px;
+}
+
+.fila {
+  display: flex;
+  gap: 8px;
+}
+
+input {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 140, 170, 0.4);
+  background: #0e1420;
+  color: #eef2f7;
+  font-size: 18px;
+  letter-spacing: 4px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+input:focus {
+  outline: none;
+  border-color: #5aaaff;
+}
+
+button {
+  cursor: pointer;
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 140, 170, 0.35);
+  background: #263041;
+  color: #eef2f7;
+  font-size: 15px;
+  font-weight: 600;
+  transition: transform 0.08s ease, background 0.15s ease;
+}
+
+button:hover {
+  background: #31405a;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+button.primario {
+  width: 100%;
+  background: linear-gradient(180deg, #3a9bff, #2b74d6);
+  border-color: #2b74d6;
+}
+
+button.primario:hover {
+  background: linear-gradient(180deg, #4aa8ff, #2f7fe4);
+}
+
+.sala {
+  margin: 16px 0;
+  font-size: 15px;
+  color: #b7c3d6;
+}
+
+.sala b {
+  font-size: 26px;
+  letter-spacing: 6px;
+  color: #ffcf5a;
+}
+
+.estado {
+  min-height: 22px;
+  margin: 14px 0 6px;
+  color: #9fb0c6;
+  font-size: 15px;
+  white-space: pre-line;
+}
+
+.ayuda {
+  margin-top: 18px;
+  color: #68758a;
+  font-size: 12px;
+}
+
+#revancha {
+  margin-top: 14px;
+}
