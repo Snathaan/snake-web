@@ -221,6 +221,8 @@ class Room {
       food: this.food,
       over: this.over,
       winner: this.winner,
+      dirs: this.dirs,
+      speed: this.speed,
     };
   }
 

@@ -73,41 +73,53 @@ scene.add(foodMesh);
 const baseColors = COLORS.map((c) => new THREE.Color(c));
 const deadColor = new THREE.Color(0x6e282d);
 
-function renderState(state) {
-  for (let p = 0; p < 2; p++) {
-    const cells = state.snakes[p];
-    const pool = pools[p];
-    while (pool.length < cells.length) {
-      const mesh = new THREE.Mesh(cubeGeo, new THREE.MeshStandardMaterial({ color: 0xffffff }));
-      scene.add(mesh);
-      pool.push(mesh);
-    }
-    const base = baseColors[p];
-    const alive = state.alive[p];
-    for (let i = 0; i < cells.length; i++) {
-      const mesh = pool[i];
-      mesh.visible = true;
-      const target = new THREE.Vector3(worldX(cells[i][0]), 0.5, worldZ(cells[i][1]));
-      if (!mesh.userData.target) mesh.position.copy(target);
-      mesh.userData.target = target;
+function renderSnake(p, cells, alive) {
+  const pool = pools[p];
+  while (pool.length < cells.length) {
+    const mesh = new THREE.Mesh(cubeGeo, new THREE.MeshStandardMaterial({ color: 0xffffff }));
+    scene.add(mesh);
+    pool.push(mesh);
+  }
+  const base = baseColors[p];
+  for (let i = 0; i < cells.length; i++) {
+    const mesh = pool[i];
+    mesh.visible = true;
+    const target = new THREE.Vector3(worldX(cells[i][0]), 0.5, worldZ(cells[i][1]));
+    if (!mesh.userData.target) mesh.position.copy(target);
+    mesh.userData.target = target;
 
-      let scale;
-      let color;
-      if (!alive) {
-        scale = 0.72;
-        color = deadColor;
-      } else if (i === 0) {
-        scale = 0.98;
-        color = base;
-      } else {
-        const f = 1 - 0.45 * (i / Math.max(1, cells.length - 1));
-        scale = 0.86;
-        color = base.clone().multiplyScalar(f);
-      }
-      mesh.scale.setScalar(scale);
-      mesh.material.color.copy(color);
+    let scale;
+    let color;
+    if (!alive) {
+      scale = 0.72;
+      color = deadColor;
+    } else if (i === 0) {
+      scale = 0.98;
+      color = base;
+    } else {
+      const f = 1 - 0.45 * (i / Math.max(1, cells.length - 1));
+      scale = 0.86;
+      color = base.clone().multiplyScalar(f);
     }
-    for (let i = cells.length; i < pool.length; i++) pool[i].visible = false;
+    mesh.scale.setScalar(scale);
+    mesh.material.color.copy(color);
+  }
+  for (let i = cells.length; i < pool.length; i++) pool[i].visible = false;
+}
+
+function renderState(state) {
+  if (myPlayerId === null) {
+    renderSnake(0, state.snakes[0], state.alive[0]);
+    renderSnake(1, state.snakes[1], state.alive[1]);
+  } else {
+    const me = myPlayerId;
+    const rival = 1 - me;
+    renderSnake(rival, state.snakes[rival], state.alive[rival]);
+    if (pred.active && pred.snake) {
+      renderSnake(me, pred.snake, true);
+    } else {
+      renderSnake(me, state.snakes[me], state.alive[me]);
+    }
   }
 
   if (state.food) {
@@ -115,6 +127,82 @@ function renderState(state) {
     foodMesh.userData.target = new THREE.Vector3(worldX(state.food[0]), 0.5, worldZ(state.food[1]));
   } else {
     foodMesh.visible = false;
+  }
+}
+
+const DIR_VEC = { up: [0, 1], down: [0, -1], left: [-1, 0], right: [1, 0] };
+
+function stopTick() {
+  if (tickTimer) {
+    clearTimeout(tickTimer);
+    tickTimer = null;
+  }
+}
+
+function restartTick() {
+  stopTick();
+  if (!inGame || !pred.active) return;
+  tickTimer = setTimeout(localTick, tickMs);
+}
+
+function localTick() {
+  tickTimer = null;
+  if (!inGame || !pred.active || !pred.snake) return;
+
+  if (pred.pending) {
+    pred.dir = pred.pending;
+    pred.pending = null;
+  }
+
+  const [dx, dz] = pred.dir;
+  const [hx, hz] = pred.snake[0];
+  const nx = hx + dx;
+  const nz = hz + dz;
+
+  if (nx >= 0 && nx < GRID && nz >= 0 && nz < GRID) {
+    pred.snake.unshift([nx, nz]);
+    const food = serverState && serverState.food;
+    const ate = food && nx === food[0] && nz === food[1];
+    if (!ate) pred.snake.pop();
+    renderSnake(myPlayerId, pred.snake, true);
+  }
+
+  restartTick();
+}
+
+function seedPrediction(state) {
+  pred.snake = state.snakes[myPlayerId].map((c) => [c[0], c[1]]);
+  pred.dir = (state.dirs && state.dirs[myPlayerId]) || [1, 0];
+  pred.pending = null;
+  pred.active = true;
+  restartTick();
+}
+
+function reconcile(state) {
+  serverState = state;
+  if (state.speed) tickMs = state.speed;
+  if (myPlayerId === null) return;
+
+  if (state.over || !state.alive[myPlayerId]) {
+    pred.active = false;
+    pred.pending = null;
+    stopTick();
+    return;
+  }
+
+  if (!pred.active || !pred.snake) {
+    seedPrediction(state);
+    return;
+  }
+
+  const mine = state.snakes[myPlayerId];
+  const head = pred.snake[0];
+  const real = mine[0];
+  const dist = Math.abs(head[0] - real[0]) + Math.abs(head[1] - real[1]);
+  if (dist >= 3 || Math.abs(pred.snake.length - mine.length) >= 2) {
+    pred.snake = mine.map((c) => [c[0], c[1]]);
+    pred.dir = (state.dirs && state.dirs[myPlayerId]) || pred.dir;
+    restartTick();
   }
 }
 
@@ -154,6 +242,11 @@ const puntajes = document.getElementById("puntajes");
 let ws = null;
 let myPlayerId = null;
 let inGame = false;
+
+let serverState = null;
+const pred = { snake: null, dir: [1, 0], pending: null, active: false };
+let tickTimer = null;
+let tickMs = 140;
 
 function setEstado(text) {
   estado.textContent = text;
@@ -219,16 +312,22 @@ function handle(msg) {
       break;
     case "state":
       if (!inGame) startGameUI();
+      reconcile(msg);
       renderState(msg);
       updateScores(msg);
       break;
     case "over":
+      pred.active = false;
+      stopTick();
       showResult(msg.winner);
       break;
     case "rematch":
+      pred.active = false;
       startGameUI();
       break;
     case "peer_left":
+      pred.active = false;
+      stopTick();
       showResult(msg.winner, "El rival salio de la partida.");
       break;
     case "error":
@@ -296,6 +395,13 @@ const KEYMAP = {
 
 function sendDirection(dir) {
   if (!inGame) return;
+  const vec = DIR_VEC[dir];
+  if (vec && pred.active) {
+    const cur = pred.dir;
+    if (!(vec[0] === -cur[0] && vec[1] === -cur[1])) {
+      pred.pending = vec;
+    }
+  }
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ type: "input", dir }));
   }
