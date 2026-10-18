@@ -7,8 +7,8 @@ const { WebSocketServer } = require("ws");
 
 const PORT = process.env.PORT || 3000;
 const GRID = 20;
-const TICK_MS = 140;
-const TICK_MIN = 70;
+const TICK_MS = 110;
+const TICK_MIN = 60;
 const PUBLIC_DIR = path.join(__dirname, "public");
 
 const MIME = {
